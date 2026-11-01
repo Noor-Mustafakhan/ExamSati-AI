@@ -13,16 +13,20 @@ import {
   BookOpen,
   LogOut,
   Briefcase,
-  ShieldCheck
+  ShieldCheck,
+  Users
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const { user, profile, signOut, isConfigured } = useAuth();
+  const { user, profile, signOut } = useAuth();
 
-  const menuItems = [
+  const isAdmin = profile?.role === 'admin';
+
+  // Standard student items accessible to all authenticated candidates
+  const studentMenuItems = [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'FPSC Jobs', path: '/fpsc-jobs', icon: Briefcase },
     { label: 'Explore Exams', path: '/exams', icon: Search },
@@ -31,7 +35,12 @@ export const DashboardLayout = () => {
     { label: 'AI Tutor', path: '/ai-tutor', icon: HelpCircle },
     { label: 'Saved Questions', path: '/saved', icon: Bookmark },
     { label: 'Performance & Mistakes', path: '/progress', icon: TrendingUp },
+  ];
+
+  // Administrative tools — strictly hidden from normal student accounts
+  const adminMenuItems = [
     { label: 'Question Quality Review', path: '/admin/review', icon: ShieldCheck },
+    { label: 'User Role Management', path: '/admin/users', icon: Users },
   ];
 
   const isActive = (path) => {
@@ -82,7 +91,7 @@ export const DashboardLayout = () => {
 
         {/* Navigation list */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => {
+          {studentMenuItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
             return (
@@ -101,14 +110,51 @@ export const DashboardLayout = () => {
               </Link>
             );
           })}
+
+          {/* Admin Management Section - Strictly shown for Admins only */}
+          {isAdmin && (
+            <div className="pt-4 mt-3 border-t border-slate-800">
+              <span className="px-3 text-[10px] font-bold tracking-wider text-slate-500 uppercase">
+                Administration
+              </span>
+              <div className="mt-1 space-y-1">
+                {adminMenuItems.map((item) => {
+                  const Icon = item.icon;
+                  const active = isActive(item.path);
+                  return (
+                    <Link
+                      key={item.label}
+                      to={item.path}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
+                        active
+                          ? 'bg-[#3156A6] text-white font-semibold'
+                          : 'text-purple-300 hover:bg-slate-800 hover:text-white'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 shrink-0 text-purple-400" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </nav>
 
         {/* Sidebar Footer User Info */}
         <div className="p-4 border-t border-slate-800 bg-[#0E1726]/40 text-xs text-slate-400 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="font-medium text-slate-200 truncate max-w-[130px]">
-              {profile?.full_name || user?.email || 'Candidate Profile'}
-            </span>
+            <div className="flex items-center gap-1.5 truncate max-w-[150px]">
+              <span className="font-medium text-slate-200 truncate">
+                {profile?.full_name || user?.email || 'Candidate Profile'}
+              </span>
+              {isAdmin && (
+                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-purple-900/60 text-purple-300 border border-purple-700">
+                  ADMIN
+                </span>
+              )}
+            </div>
             {user ? (
               <button
                 onClick={() => signOut()}

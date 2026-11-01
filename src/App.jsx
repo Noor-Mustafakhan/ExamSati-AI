@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
+import { AdminRoute } from './components/layout/AdminRoute';
 import { MainLayout } from './components/layout/MainLayout';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { LandingPage } from './pages/LandingPage';
@@ -16,6 +17,7 @@ import { AITutorPage } from './pages/AITutorPage';
 import { ProgressPage } from './pages/ProgressPage';
 import { SavedQuestionsPage } from './pages/SavedQuestionsPage';
 import { AdminQuestionReviewPage } from './pages/AdminQuestionReviewPage';
+import { AdminUserManagementPage } from './pages/AdminUserManagementPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -55,8 +57,13 @@ export function App() {
                 <Route path="/ai-tutor" element={<AITutorPage />} />
                 <Route path="/progress" element={<ProgressPage />} />
                 <Route path="/saved" element={<SavedQuestionsPage />} />
-                <Route path="/admin/questions" element={<AdminQuestionReviewPage />} />
-                <Route path="/admin/review" element={<AdminQuestionReviewPage />} />
+
+                {/* Strictly Guarded Admin Workspace */}
+                <Route element={<AdminRoute />}>
+                  <Route path="/admin/questions" element={<AdminQuestionReviewPage />} />
+                  <Route path="/admin/review" element={<AdminQuestionReviewPage />} />
+                  <Route path="/admin/users" element={<AdminUserManagementPage />} />
+                </Route>
               </Route>
             </Route>
 
